@@ -1,9 +1,21 @@
-import { defineNuxtModule, logger, addComponentsDir, isNuxt2 as _isNuxt2, addPluginTemplate } from '@nuxt/kit'
+import { defineNuxtModule, createResolver, logger, isNuxt2 as _isNuxt2, addPluginTemplate, addComponent } from '@nuxt/kit'
 import defu from 'defu'
-import { ADSENSE_URL, DEFAULTS, ModuleOptions, TEST_ID, CONFIG_KEY } from './config'
+import { ADSENSE_URL, TEST_ID, CONFIG_KEY } from './config'
 import { resolveRuntimeDir, resolveTemplateDir } from './dirs'
 
-export type { ModuleOptions }
+export interface ModuleOptions {
+  tag?: string,
+  id?: string,
+  analyticsUacct?: string,
+  analyticsDomainName?: string,
+  pageLevelAds?: boolean,
+  includeQuery?: boolean,
+  overlayBottom?: boolean,
+  onPageLoad?: boolean,
+  pauseOnLoad?: boolean,
+  test?: boolean
+}
+
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
@@ -14,10 +26,19 @@ export default defineNuxtModule<ModuleOptions>({
     }
   },
   defaults: (nuxt) => ({
-    ...DEFAULTS,
-    test: nuxt.options.dev && process.env.NODE_ENV !== 'production'
+    tag: 'adsbygoogle',
+    pageLevelAds: false,
+    includeQuery: false,
+    analyticsUacct: '',
+    analyticsDomainName: '',
+    overlayBottom: false,
+    test: nuxt.options.dev && process.env.NODE_ENV !== 'production' ? true : false,
+    onPageLoad: false,
+    pauseOnLoad: false,
   }),
-  setup (options, nuxt) {
+  setup(options, nuxt) {
+    const { resolve } = createResolver(import.meta.url)
+
     if (options.test) {
       logger.info('Test mode enabled - Using Test AdSense ID')
       options.id = TEST_ID
@@ -30,51 +51,29 @@ export default defineNuxtModule<ModuleOptions>({
 
     const isNuxt2 = _isNuxt2(nuxt)
 
-    const useNuxtMeta = (fn: Function) => fn(isNuxt2 ? nuxt.options.head : nuxt.options.app.head)
+    const head = isNuxt2 ? nuxt.options.head : nuxt.options.app.head
+    head.script = head.script ?? []
 
-    useNuxtMeta((head: any) => {
-      head.script = head.script ?? []
-
-      // Add the async Google AdSense script to head
-      head.script.push({
-        hid: 'adsbygoogle-script',
-        defer: true,
-        crossorigin: 'anonymous',
-        src: `${ADSENSE_URL}?client=${options.id}`
-      })
-
-      const adsenseScript = `{
-        google_ad_client: "${options.id}",
-        overlays: {bottom: ${options.overlayBottom}},
-        ${options.pageLevelAds ? 'enable_page_level_ads: true' : ''}
-      }`
-      // Initialize AdSense with ad client id
-      if (!options.onPageLoad) {
-        head.script.push(
-          createScriptMeta(
-            `adsbygoogle.pauseAdRequests=${options.pauseOnLoad ? '1' : '0'};
-            adsbygoogle.push(${adsenseScript});`, isNuxt2)
-        )
-      } else {
-        head.script.push(
-          createScriptMeta(
-            `adsbygoogle.onload = function () {
-              adsbygoogle.pauseAdRequests=${options.pauseOnLoad ? '1' : '0'};
-              [].forEach.call(document.getElementsByClassName('adsbygoogle'), function () { adsbygoogle.push(${adsenseScript}); })
-            };`, isNuxt2)
-        )
-      }
-
-      // If in DEV mode, add robots meta first to comply with AdSense policies
-      // To prevent MediaPartners from scraping the site
-      if (options.test) {
-        head.meta = head.meta ?? []
-        head.meta.unshift({
-          name: 'robots',
-          content: 'noindex,noarchive,nofollow'
-        })
-      }
+    head.script.push({
+      hid: 'adsbygoogle-script',
+      defer: true,
+      crossorigin: 'anonymous',
+      src: `${ADSENSE_URL}?client=${options.id}`
     })
+
+    // Initialize AdSense with ad client id
+    const scriptMeta = initializeAdClient(options)
+    head.script.push(scriptMeta)
+
+    // If in DEV mode, add robots meta first to comply with AdSense policies
+    // To prevent MediaPartners from scraping the site
+    if (options.test) {
+      head.meta = head.meta ?? []
+      head.meta.unshift({
+        name: 'robots',
+        content: 'noindex,noarchive,nofollow'
+      })
+    }
 
     if (isNuxt2) {
       addPluginTemplate({
@@ -87,9 +86,10 @@ export default defineNuxtModule<ModuleOptions>({
       })
     } else {
       // Add component to auto load
-      addComponentsDir({
-        path: resolveRuntimeDir('components-v3'),
-      })
+    addComponent({
+      name: 'Adsbygoogle',
+      filePath: resolve('runtime/components-v3/Adsbygoogle.vue')
+    })
     }
 
     // Inject options into runtime config
@@ -107,7 +107,7 @@ export default defineNuxtModule<ModuleOptions>({
   }
 })
 
-function createScriptMeta (script: string, isNuxt2: boolean) {
+function createScriptMeta (script: string) {
   // Ensure `window.adsbygoogle` is defined
   script = `(window.adsbygoogle = window.adsbygoogle || []); ${script}`
   // wrap script inside a guard check to ensure it executes only once
@@ -117,3 +117,26 @@ function createScriptMeta (script: string, isNuxt2: boolean) {
     innerHTML: script
   }
 }
+
+
+function initializeAdClient(options: ModuleOptions) {
+  const adsenseScript = `{
+        google_ad_client: "${options.id}",
+        overlays: {bottom: ${options.overlayBottom}},
+        ${options.pageLevelAds ? 'enable_page_level_ads: true' : ''}
+      }`
+
+  if (!options.onPageLoad)
+    return createScriptMeta(
+      `adsbygoogle.pauseAdRequests=${options.pauseOnLoad ? '1' : '0'}
+      adsbygoogle.push(${adsenseScript});`,
+    )
+
+  return createScriptMeta(
+    `adsbygoogle.onload = function () {
+              adsbygoogle.pauseAdRequests=${options.pauseOnLoad ? '1' : '0'};
+              [].forEach.call(document.getElementsByClassName('adsbygoogle'), function () { adsbygoogle.push(${adsenseScript}); })
+            };`)
+}
+
+

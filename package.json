@@ -7,6 +7,7 @@
   "type": "module",
   "exports": {
     ".": {
+      "types": "./dist/types.d.ts",
       "import": "./dist/module.mjs",
       "require": "./dist/module.cjs"
     }
@@ -21,25 +22,27 @@
   },
   "scripts": {
     "prepack": "nuxt-module-build",
-    "dev": "nuxt dev playground",
+    "dev": "nuxi dev playground",
     "dev:nuxt2": "cd nuxt2-playground && yarn dev",
-    "dev:build": "nuxt build playground",
+    "dev:build": "nuxi build playground",
     "dev:prepare": "nuxt-module-build --stub && nuxi prepare playground",
     "test": "yarn vitest run",
     "release": "standard-version"
   },
   "dependencies": {
-    "@nuxt/kit": "^3.0.0-rc.12"
+    "@nuxt/kit": "^3.6.5"
   },
   "devDependencies": {
-    "@nuxt/module-builder": "^0.2.0",
-    "@nuxt/schema": "^3.0.0-rc.12",
-    "@nuxt/test-utils": "^3.0.0-rc.12",
-    "@nuxtjs/eslint-config-typescript": "^11.0.0",
-    "eslint": "^8.26.0",
-    "nuxt": "^3.0.0-rc.12",
+    "@types/node": "^18.16.19",
+    "@nuxt/devtools": "latest",
+    "@nuxt/eslint-config": "^0.1.1",
+    "@nuxt/module-builder": "^0.4.0",
+    "@nuxt/schema": "^3.6.5",
+    "@nuxt/test-utils": "^3.6.5",
+    "eslint": "^8.45.0",
+    "nuxt": "^3.6.5",
     "standard-version": "^9.5.0",
-    "vitest": "^0.24.3"
+    "vitest": "^0.33.0"
   },
   "resolutions": {
     "@nuxtjs/google-adsense": "link:./"
