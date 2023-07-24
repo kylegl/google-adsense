@@ -18,28 +18,25 @@ withDefaults(defineProps<{
   analyticsDomainName?: string
   includeQuery?: boolean
 }>(),
-  {
-    adFormat: 'auto',
-    adStyle: () => ({ display: 'block' })
-  })
+{
+  adFormat: 'auto',
+  adFullWidthResponsive: false,
+  adStyle: () => ({ display: 'block' })
+})
+
+const config = useRuntimeConfig().public[CONFIG_KEY]
+const options = {
+  ...config,
+  id: config.test ? 'ca-google' : config.id,
+}
+
 const ad = ref<HTMLElement | null>(null)
-const r = useRoute()
-const route = computed(() => r)
 const show = ref(false)
+const route = useRoute()
 
 const isConnected = computed(() => ad.value?.isConnected || false)
 const innerHtml = computed(() => show.value ? '' : ' ')
 const key = computed(() => Math.random())
-const options = computed(() => {
-  const options = {
-    ...useRuntimeConfig().public[CONFIG_KEY]
-  }
-
-  if (options?.test)
-    options.id = 'ca-google'
-
-  return options
-})
 
 // update ad on route change
 watch(route, (newRoute, oldRoute) => {
@@ -69,15 +66,24 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <ins ref="ad" :key="key" class="adsbygoogle" :style="adStyle" :data-ad-client="adClient || options.id"
-      :data-ad-slot="adSlot || null" :data-ad-format="adFormat" :data-ad-region="show ? adRegion() : null"
-      :data-ad-layout="adLayout || null" :data-ad-layout-key="adLayoutKey || null" :data-page-url="pageUrl || null"
-      :data-analytics-uacct="analyticsUacct || options.analyticsUacct || null"
-      :data-analytics-domain-name="analyticsDomainName || options.analyticsDomainName || null"
-      :data-adtest="options.test ? 'on' : null" :data-adsbygoogle-status="show ? null : ''"
-      :data-ad-full-width-responsive="adFullWidthResponsive">
-      {{ innerHtml }}
-    </ins>
-  </div>
+  <ins
+    ref="ad"
+    :key="key"
+    class="adsbygoogle"
+    :style="adStyle"
+    :data-ad-client="adClient || options.id"
+    :data-ad-slot="adSlot || null"
+    :data-ad-format="adFormat"
+    :data-ad-region="show ? adRegion() : null"
+    :data-ad-layout="adLayout || null"
+    :data-ad-layout-key="adLayoutKey || null"
+    :data-page-url="pageUrl || null"
+    :data-analytics-uacct="analyticsUacct || options.analyticsUacct || null"
+    :data-analytics-domain-name="analyticsDomainName || options.analyticsDomainName || null"
+    :data-adtest="options.test ? 'on' : null"
+    :data-adsbygoogle-status="show ? null : ''"
+    :data-ad-full-width-responsive="adFullWidthResponsive"
+  >
+    {{ innerHtml }}
+  </ins>
 </template>

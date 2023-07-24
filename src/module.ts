@@ -1,7 +1,6 @@
-import { defineNuxtModule, createResolver, logger, isNuxt2 as _isNuxt2, addPluginTemplate, addComponent } from '@nuxt/kit'
+import { defineNuxtModule, createResolver, logger, addComponent } from '@nuxt/kit'
 import defu from 'defu'
 import { ADSENSE_URL, TEST_ID, CONFIG_KEY } from './config'
-import { resolveRuntimeDir, resolveTemplateDir } from './dirs'
 
 export interface ModuleOptions {
   tag?: string,
@@ -22,7 +21,7 @@ export default defineNuxtModule<ModuleOptions>({
     name: '@nuxtjs/google-adsense',
     configKey: CONFIG_KEY,
     compatibility: {
-      nuxt: '^2.15.0 || ^3.0.0-rc.11'
+      nuxt: '^3.0.0'
     }
   },
   defaults: (nuxt) => ({
@@ -49,9 +48,8 @@ export default defineNuxtModule<ModuleOptions>({
       return
     }
 
-    const isNuxt2 = _isNuxt2(nuxt)
 
-    const head = isNuxt2 ? nuxt.options.head : nuxt.options.app.head
+    const head = nuxt.options.app.head
     head.script = head.script ?? []
 
     head.script.push({
@@ -75,41 +73,23 @@ export default defineNuxtModule<ModuleOptions>({
       })
     }
 
-    if (isNuxt2) {
-      addPluginTemplate({
-        src: resolveTemplateDir('./plugin.mjs'),
-        filename: 'adsbygoogle.js',
-        options: {
-          component: resolveRuntimeDir('./components/Adsbygoogle.vue'),
-          alias: options.tag
-        }
-      })
-    } else {
       // Add component to auto load
     addComponent({
       name: 'Adsbygoogle',
       filePath: resolve('runtime/components-v3/Adsbygoogle.vue')
     })
-    }
 
-    // Inject options into runtime config
-    if (isNuxt2) {
-      nuxt.options.publicRuntimeConfig[CONFIG_KEY] = defu(
-        nuxt.options.publicRuntimeConfig[CONFIG_KEY],
-        options
-      )
-    } else {
-      nuxt.options.runtimeConfig.public[CONFIG_KEY] = defu(
-        nuxt.options.runtimeConfig.public[CONFIG_KEY],
-        options
-      )
-    }
+    nuxt.options.runtimeConfig.public[CONFIG_KEY] = defu(
+      nuxt.options.runtimeConfig.public[CONFIG_KEY],
+      options
+    )
   }
 })
 
 function createScriptMeta (script: string) {
   // Ensure `window.adsbygoogle` is defined
   script = `(window.adsbygoogle = window.adsbygoogle || []); ${script}`
+
   // wrap script inside a guard check to ensure it executes only once
   script = `if (!window.__abg_called){ ${script} window.__abg_called = true;}`
   return {
@@ -139,4 +119,4 @@ function initializeAdClient(options: ModuleOptions) {
             };`)
 }
 
-
+export {}

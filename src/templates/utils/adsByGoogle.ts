@@ -1,4 +1,4 @@
-import { RouteLocationNormalizedLoaded } from 'vue-router'
+import {RouteLocationNormalizedLoaded} from 'vue-router'
 import { Ref } from 'vue'
 import { nextTick } from '#imports'
 
@@ -6,7 +6,7 @@ import { nextTick } from '#imports'
 export interface AdsByGoogleWindow extends Window {
   adsbygoogle: unknown[]
 }
-export declare let window: AdsByGoogleWindow
+declare let window: AdsByGoogleWindow
 
 
 export function hasRouteChanged(
@@ -27,7 +27,7 @@ export function hasRouteChanged(
 }
 
 export async function updateAd(show: Ref<boolean>) {
-  if (process.server)
+  if(process.server)
     return
 
   show.value = false
