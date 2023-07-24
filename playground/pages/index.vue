@@ -16,7 +16,7 @@
       </NuxtLink>
       <p><strong>The gray area shows the advertisement</strong></p>
     </div>
-    <Adsbygoogle/>
+    <Adsbygoogle />
   </div>
 </template>
 

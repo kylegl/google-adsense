@@ -76,7 +76,7 @@ export default defineNuxtModule<ModuleOptions>({
       // Add component to auto load
     addComponent({
       name: 'Adsbygoogle',
-      filePath: resolve('runtime/components-v3/Adsbygoogle.vue')
+      filePath: resolve('runtime/components/Adsbygoogle.vue')
     })
 
     nuxt.options.runtimeConfig.public[CONFIG_KEY] = defu(
@@ -118,5 +118,3 @@ function initializeAdClient(options: ModuleOptions) {
               [].forEach.call(document.getElementsByClassName('adsbygoogle'), function () { adsbygoogle.push(${adsenseScript}); })
             };`)
 }
-
-export {}

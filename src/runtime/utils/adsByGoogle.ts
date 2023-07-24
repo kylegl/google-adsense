@@ -8,46 +8,57 @@ export interface AdsByGoogleWindow extends Window {
 }
 export declare let window: AdsByGoogleWindow
 
+export function useAdsense() {
 
-export function hasRouteChanged(
-  newRoute: RouteLocationNormalizedLoaded,
-  oldRoute?: RouteLocationNormalizedLoaded,
-) {
 
-  // check if path changed
-  if (newRoute.path !== oldRoute?.path)
-    return true
+  function hasRouteChanged(
+    newRoute: RouteLocationNormalizedLoaded,
+    oldRoute?: RouteLocationNormalizedLoaded,
+  ) {
 
-  const newQueryKeys = Object.keys(newRoute.query)
-  const oldQueryKeys = Object.keys(oldRoute.query)
+    // check if path changed
+    if (newRoute.path !== oldRoute?.path)
+      return true
 
-  // check if query changed
-  return newQueryKeys.length !== oldQueryKeys.length
-    || newQueryKeys.some((key) => newRoute.query[key] !== oldRoute.query[key])
-}
+    const newQueryKeys = Object.keys(newRoute.query)
+    const oldQueryKeys = Object.keys(oldRoute.query)
 
-export async function updateAd(show: Ref<boolean>) {
-  if (process.server)
-    return
+    // check if query changed
+    return newQueryKeys.length !== oldQueryKeys.length
+      || newQueryKeys.some((key) => newRoute.query[key] !== oldRoute.query[key])
+  }
 
-  show.value = false
-  await nextTick()
-  show.value = true
-}
-
-export function showAd(ad: HTMLElement | null) {
-  setTimeout(() => {
-    if (ad?.innerHTML)
+  async function updateAd(show: Ref<boolean>) {
+    if (process.server)
       return
 
-    try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({})
-    } catch (error) {
-      console.error(error)
-    }
-  }, 50)
-}
+    show.value = false
+    await nextTick()
+    show.value = true
+  }
 
-export function adRegion() {
-  return `page-${Math.random()}`
+  function showAd(ad: HTMLElement | null) {
+    setTimeout(() => {
+      if (ad?.innerHTML)
+        return
+
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({})
+      } catch (error) {
+        console.error(error)
+      }
+    }, 50)
+  }
+
+  function generateAdRegion() {
+    return `page-${Math.random()}`
+  }
+
+
+  return {
+    hasRouteChanged,
+    updateAd,
+    showAd,
+    generateAdRegion
+  }
 }
