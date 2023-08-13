@@ -1,7 +1,7 @@
 import { defineNuxtModule, createResolver, logger, addComponent, addImports } from '@nuxt/kit'
 import defu from 'defu'
-import { ADSENSE_URL, TEST_ID } from './constants'
 import { initializeAdClient } from './utils'
+
 
 export interface ModuleOptions {
   tag?: string,
@@ -15,6 +15,12 @@ export interface ModuleOptions {
   pauseOnLoad?: boolean,
   test?: boolean
 }
+
+// AdSense script URL
+const ADSENSE_URL = '//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js'
+// Default client ID for testing
+const TEST_ID = 'ca-google'
+
 
 
 export default defineNuxtModule<ModuleOptions>({
@@ -40,15 +46,14 @@ export default defineNuxtModule<ModuleOptions>({
   setup(options, nuxt) {
     const { resolve } = createResolver(import.meta.url)
 
-    if (options.test)
+    if (options.test) {
       logger.info('Test mode enabled - Using Test AdSense ID')
-
-
-    else if (options.id === TEST_ID || typeof options.id !== 'string') {
+      // options.id = TEST_ID
+    }
+    else if (options.id !== TEST_ID || typeof options.id !== 'string') {
       logger.warn('Invalid AdSense client ID specified')
       return
     }
-
 
     const head = nuxt.options.app.head
     head.script = head.script ?? []
@@ -87,10 +92,8 @@ export default defineNuxtModule<ModuleOptions>({
     })
 
     nuxt.options.runtimeConfig.public.googleAdsense = defu(
-      //@ts-ignore
       nuxt.options.runtimeConfig.public.googleAdsense,
       options
     )
   }
 })
-
