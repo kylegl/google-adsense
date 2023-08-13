@@ -34,7 +34,7 @@ export function useAdsense(
   async function updateAd() {
     if (process.server)
       return
-    
+
     setTimeout(() => {
       if (ad.value?.innerHTML)
         return
