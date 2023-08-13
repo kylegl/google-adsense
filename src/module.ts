@@ -1,6 +1,6 @@
-import { defineNuxtModule, createResolver, logger, addComponent } from '@nuxt/kit'
+import { defineNuxtModule, createResolver, logger, addComponent, addImports } from '@nuxt/kit'
 import defu from 'defu'
-import { ADSENSE_URL, TEST_ID, CONFIG_KEY } from './config'
+import { ADSENSE_URL, TEST_ID} from './config'
 
 export interface ModuleOptions {
   tag?: string,
@@ -19,19 +19,20 @@ export interface ModuleOptions {
 export default defineNuxtModule<ModuleOptions>({
   meta: {
     name: '@nuxtjs/google-adsense',
-    configKey: CONFIG_KEY,
+    configKey: 'googleAdsense',
     compatibility: {
-      nuxt: '^3.0.0'
+      nuxt: '^3.X.X'
     }
   },
   defaults: (nuxt) => ({
+    id: TEST_ID,
     tag: 'adsbygoogle',
     pageLevelAds: false,
     includeQuery: false,
     analyticsUacct: '',
     analyticsDomainName: '',
     overlayBottom: false,
-    test: nuxt.options.dev && process.env.NODE_ENV !== 'production' ? true : false,
+    test: nuxt.options.dev && (process.env.NODE_ENV !== 'production'),
     onPageLoad: false,
     pauseOnLoad: false,
   }),
@@ -73,20 +74,26 @@ export default defineNuxtModule<ModuleOptions>({
       })
     }
 
+    addImports({
+      name: 'useAdsense',
+      as: 'useAdsense',
+      from: resolve('runtime/composables/adsense')
+    })
+
       // Add component to auto load
     addComponent({
       name: 'Adsbygoogle',
       filePath: resolve('runtime/components/Adsbygoogle.vue')
     })
 
-    nuxt.options.runtimeConfig.public[CONFIG_KEY] = defu(
-      nuxt.options.runtimeConfig.public[CONFIG_KEY],
+    nuxt.options.runtimeConfig.public.googleAdsense = defu(
+      nuxt.options.runtimeConfig.public.googleAdsense,
       options
     )
   }
 })
 
-function createScriptMeta (script: string) {
+function createScriptMeta(script: string) {
   // Ensure `window.adsbygoogle` is defined
   script = `(window.adsbygoogle = window.adsbygoogle || []); ${script}`
 
@@ -108,13 +115,13 @@ function initializeAdClient(options: ModuleOptions) {
 
   if (!options.onPageLoad)
     return createScriptMeta(
-      `adsbygoogle.pauseAdRequests=${options.pauseOnLoad ? '1' : '0'}
+      `adsbygoogle.pauseAdRequests=${options.pauseOnLoad ? '1' : '0'};
       adsbygoogle.push(${adsenseScript});`,
     )
 
   return createScriptMeta(
-    `adsbygoogle.onload = function () {
-              adsbygoogle.pauseAdRequests=${options.pauseOnLoad ? '1' : '0'};
-              [].forEach.call(document.getElementsByClassName('adsbygoogle'), function () { adsbygoogle.push(${adsenseScript}); })
-            };`)
+    `adsbygoogle.onload = function() {
+      adsbygoogle.pauseAdRequests=${options.pauseOnLoad ? '1' : '0'};
+      [].forEach.call(document.getElementsByClassName('adsbygoogle'), function() { adsbygoogle.push(${adsenseScript}); })
+    };`)
 }
