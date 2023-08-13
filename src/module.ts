@@ -83,7 +83,7 @@ export default defineNuxtModule<ModuleOptions>({
       // Add component to auto load
     addComponent({
       name: 'Adsbygoogle',
-      filePath: resolve('runtime/components/Adsbygoogle.vue')
+      filePath: resolve('runtime/components/Adsbygoogle.client.vue')
     })
 
     nuxt.options.runtimeConfig.public.googleAdsense = defu(
