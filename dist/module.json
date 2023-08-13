@@ -1,0 +1,8 @@
+{
+  "name": "@nuxtjs/google-adsense",
+  "configKey": "googleAdsense",
+  "compatibility": {
+    "nuxt": "^3.X.X"
+  },
+  "version": "1.0.0"
+}
