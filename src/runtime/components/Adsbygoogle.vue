@@ -30,11 +30,7 @@ withDefaults(defineProps<{
   })
 
 const config = useRuntimeConfig().public.googleAdsense as ModuleOptions
-const options = {
-  ...config,
-  id: config?.test ? 'ca-google' : config?.id
-}
-
+const options = { ...config }
 
 const ad = ref<HTMLElement | null>(null)
 const route = useRoute()

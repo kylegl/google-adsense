@@ -1,6 +1,7 @@
 import { defineNuxtModule, createResolver, logger, addComponent, addImports } from '@nuxt/kit'
 import defu from 'defu'
-import { ADSENSE_URL, TEST_ID} from './config'
+import { ADSENSE_URL, TEST_ID } from './constants'
+import { initializeAdClient } from './utils'
 
 export interface ModuleOptions {
   tag?: string,
@@ -39,12 +40,11 @@ export default defineNuxtModule<ModuleOptions>({
   setup(options, nuxt) {
     const { resolve } = createResolver(import.meta.url)
 
-    if (options.test) {
+    if (options.test)
       logger.info('Test mode enabled - Using Test AdSense ID')
-      options.id = TEST_ID
-    }
 
-    if (!options.id || typeof options.id !== 'string') {
+
+    else if (options.id === TEST_ID || typeof options.id !== 'string') {
       logger.warn('Invalid AdSense client ID specified')
       return
     }
@@ -93,35 +93,3 @@ export default defineNuxtModule<ModuleOptions>({
   }
 })
 
-function createScriptMeta(script: string) {
-  // Ensure `window.adsbygoogle` is defined
-  script = `(window.adsbygoogle = window.adsbygoogle || []); ${script}`
-
-  // wrap script inside a guard check to ensure it executes only once
-  script = `if (!window.__abg_called){ ${script} window.__abg_called = true;}`
-  return {
-    hid: 'adsbygoogle',
-    innerHTML: script
-  }
-}
-
-
-function initializeAdClient(options: ModuleOptions) {
-  const adsenseScript = `{
-        google_ad_client: "${options.id}",
-        overlays: {bottom: ${options.overlayBottom}},
-        ${options.pageLevelAds ? 'enable_page_level_ads: true' : ''}
-      }`
-
-  if (!options.onPageLoad)
-    return createScriptMeta(
-      `adsbygoogle.pauseAdRequests=${options.pauseOnLoad ? '1' : '0'};
-      adsbygoogle.push(${adsenseScript});`,
-    )
-
-  return createScriptMeta(
-    `adsbygoogle.onload = function() {
-      adsbygoogle.pauseAdRequests=${options.pauseOnLoad ? '1' : '0'};
-      [].forEach.call(document.getElementsByClassName('adsbygoogle'), function() { adsbygoogle.push(${adsenseScript}); })
-    };`)
-}

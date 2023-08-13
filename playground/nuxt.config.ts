@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
   modules: ['../src/module'],
-  'googleAdsense': {},
+  googleAdsense: {},
   devtools: { enabled: true }
 })
