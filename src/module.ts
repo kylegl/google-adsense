@@ -1,5 +1,5 @@
 import { defineNuxtModule, createResolver, logger, addComponent, addImports } from '@nuxt/kit'
-import defu from 'defu'
+import { defu } from 'defu'
 import { initializeAdClient } from './utils'
 
 
