@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v0.0.2-0
+
+[compare changes](https://github.com/kylegl/google-adsense/compare/v0.0.1...v0.0.2-0)
+
+### 🩹 Fixes
+
+- Vueuse dependency ([049a081](https://github.com/kylegl/google-adsense/commit/049a081))
+
+### ❤️  Contributors
+
+- Kyle <lauber.kyle@gmail.com>
+
 ## v0.0.1
 
 [compare changes](https://github.com/kylegl/google-adsense/compare/v1.0.1...v0.0.1)
