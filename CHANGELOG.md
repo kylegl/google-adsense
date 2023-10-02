@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v0.0.3-0
+
+[compare changes](https://github.com/kylegl/google-adsense/compare/v0.0.1...v0.0.3-0)
+
+### 🩹 Fixes
+
+- Vueuse dependency ([049a081](https://github.com/kylegl/google-adsense/commit/049a081))
+- Unnecessary withDefaults ([d9d8592](https://github.com/kylegl/google-adsense/commit/d9d8592))
+
+### 💅 Refactors
+
+- Nuxt 3 component composition api ([70c78f8](https://github.com/kylegl/google-adsense/commit/70c78f8))
+
+### 📖 Documentation
+
+- Update readme ([61e5e4f](https://github.com/kylegl/google-adsense/commit/61e5e4f))
+
+### 🏡 Chore
+
+- Update nuxt module builder packages ([a635a93](https://github.com/kylegl/google-adsense/commit/a635a93))
+- **release:** V0.0.1 ([e60edec](https://github.com/kylegl/google-adsense/commit/e60edec))
+
+### 🎨 Styles
+
+- Playground ([460ca89](https://github.com/kylegl/google-adsense/commit/460ca89))
+
+### ❤️  Contributors
+
+- Kyle <lauber.kyle@gmail.com>
+
 ## v0.0.2-0
 
 [compare changes](https://github.com/kylegl/google-adsense/compare/v0.0.1...v0.0.2-0)
